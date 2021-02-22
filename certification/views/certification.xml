@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="certification_view_list" model="ir.ui.view">
+        <field name="name">Certification List</field>
+        <field name="model">certification</field>
+        <field name="arch" type="xml">
+            <tree string="Certification">
+               <field name="number"/>
+               <field name="date"/>
+               <field name="standard_id"/>
+               <field name="entity_id"/>
+               <field name="owner_id"/>
+           </tree>
+       </field>
+   </record>
+
+
+    <record id="certification_form" model="ir.ui.view">
+        <field name="name">Certification Form</field>
+        <field name="model">certification</field>
+        <field name="arch" type="xml">
+            <form strig ="Certification">
+                <sheet>
+                    <group>
+                        <field name="number"/>
+                        <field name="description"/>
+                        <field name="date"/>
+                        <field name="standard_id"/>
+                        <field name="entity_id" domain="[('is_certification_body','=','True')]"/>
+                        <!--A simple domain is created the following way: [('string','operator','value')]
+                            and can be combined with other simple domains using & and |.
+                            They are normally used in:
+                                - search([('entity_id','=','True')])
+                                - add a filter domain to a field: <field name="entity_id" domain="[('entity_id', '=', True)]"/>-->
+                        <field name="owner_id"/>
+                        <field name="expiry_days"/>
+                        <field name="expiry_status"/>
+                        <button name="update_date_one_month" string="Update the validation date one month" type="object"/>
+                    </group>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <record id="certification" model="ir.actions.act_window">
+        <field name="name">Certification</field>
+        <field name="res_model">certification</field>
+        <field name="view_mode">tree,form</field>
+    </record>
+
+   <menuitem
+       name="Certifications"
+       id="certification_menu"
+       sequence="5"
+       action="certification"/>
+
+</odoo>

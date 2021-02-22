@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+   <record id="module_category_certification" model="ir.module.category">
+       <field name="name">Certification</field>
+       <field name="sequence">10</field>
+   </record>
+
+    <record id="group_certification_user" model="res.groups">
+       <field name="name">Certification User</field>
+       <field name="category_id" ref="module_category_certification"/>
+    </record>
+
+    <!--
+    - name: Name identification
+    - users: Users that we want to belong in this group (generally, admin and root user)
+    - implied_ids: Inherited groups (generally, Managers belongs to Users group also)
+    - category_id: We can define a category to wrap similar groups (model ir_module_category)
+    - domain_force	* Not yet! Trickier statement. Coming soon, after explanation about domains.
+    -->
+
+   <record id="group_certification_manager" model="res.groups">
+       <field name="name">Certification Manager</field>
+       <field name="users" eval="[(4, ref('base.user_root')), (4, ref('base.user_admin'))]"/>
+       <field name="implied_ids" eval="[(4, ref('group_certification_user'))]"/>
+       <field name="category_id" ref="module_category_certification"/>
+   </record>
+
+    <!--Creating security groups and assigning them to users ****
+            - (4,id) This adds an existing record with the supplied ID to the list of related records.
+            - (6,id_list) This creates a relation between the record being updated and the existing record, whose IDs are in the Python list called id_list .
+
+        One2many and Many2many use a special “commands” format to manipulate the set of records stored in/associated
+        with the field. This format is a list of triplets executed sequentially, where each triplet is a command to execute
+        on the set of records. Not all commands apply in all situations. Possible commands are:
+            - (0, _, values): adds a new record created from the provided value dict.
+            - (1, id, values): updates an existing record of id id with the values in values. Can not be used in create().
+            - (2, id, _): removes the record of id id from the set, then deletes it (from the database). Can not be used in create().
+            - (3, id, _): removes the record of id id from the set, but does not delete it. Can not be used on One2many. Can not be used in create().
+            - (4, id, _): adds an existing record of id id to the set. Can not be used on One2many.
+            - (5, _, _): removes all records from the set, equivalent to using the command 3 on every record explicitly. Can not be used on One2many. Can not be used in create().
+            - (6, _, ids): replaces all existing records in the set by the ids list, equivalent to using the command 5 followed by a command 4 for each id in ids. Can not be used on One2many.
+    -->
+</odoo>
