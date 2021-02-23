@@ -12,7 +12,7 @@
                <field name="owner_id"/>
            </tree>
        </field>
-   </record>
+    </record>
 
 
     <record id="certification_form" model="ir.ui.view">

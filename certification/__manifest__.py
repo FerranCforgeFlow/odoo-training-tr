@@ -10,5 +10,8 @@
     "website": "https://github.com/OCA/partner-contact",
     "license": "AGPL-3",
     'depends': ['base'],
-    "data": ["security/ir.model.access.csv","security/certification_security.xml","views/certification.xml","views/certification_standard.xml","views/res_partner.xml","views/certification_bodies.xml","data/certification_data.xml"],
+    "data": ["security/ir.model.access.csv","security/certification_security.xml","views/certification.xml",
+             "views/certification_standard.xml","views/res_partner.xml","views/certification_bodies.xml",
+             "data/certification_data.xml","reports/certification_report.xml","reports/certification_template_pdf.xml",
+             "reports/certification_report_pdf.xml"],
 }

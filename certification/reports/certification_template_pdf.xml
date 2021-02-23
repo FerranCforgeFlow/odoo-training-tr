@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+<template id="certification_template_pdf">
+   <t t-call="web.html_container">
+           <t t-call="web.internal_layout">
+               <div class="page">
+                   <h1>Certifications</h1>
+                   <table class="table table-condensed">
+                       <thead>
+                           <tr>
+                               <th>Number</th>
+                               <th>Standard</th>
+                               <th>Owner</th>
+                               <th>Owner Category</th>
+                               <th>Certification Body</th>
+                               <th>Expiry Date</th>
+                           </tr>
+                       </thead>
+                       <tbody>
+                        <t t-foreach="docs" t-as="doc">
+                           <tr>
+                               <td><t t-esc="doc.number" /></td>
+                               <td><t t-esc="doc.standard_id.name" /></td>
+                               <td><t t-esc="doc.owner_id.name" /></td>
+                               <td><t t-esc="doc.owner_id.category_id.name" /></td>
+                               <td><t t-esc="doc.entity_id.name" /></td>
+                               <td><t t-esc="doc.date" /></td>
+                           </tr>
+                          </t>
+                       </tbody>
+                   </table>
+               </div>
+           </t>
+     </t>
+</template>
+</odoo>
+
+<!--
+Here we define the structure of the PDF file.
+tcall:web html container: doesn't really have an alternative
+tcall: internal layout: defines the format of the header and footer of the report
+div class:page - here we introduce the content of the report
+h1- This is the main title of the report.
+-->
