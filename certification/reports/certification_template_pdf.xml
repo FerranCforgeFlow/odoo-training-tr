@@ -35,6 +35,8 @@
 </template>
 </odoo>
 
+
+
 <!--
 Here we define the structure of the PDF file.
 tcall:web html container: doesn't really have an alternative
