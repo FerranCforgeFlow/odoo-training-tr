@@ -25,11 +25,21 @@
         </field>
     </record>
 
+
+    <!-- <record model="ir.actions.act_window"> vs <act_window>
     <act_window id="action_report_certification"
       name="Certification Analysis"
       res_model="certification.report"
       view_mode="graph,pivot"
       target="current"/>
+    -->
+    <record id="action_report_certification" model="ir.actions.act_window">
+        <field name="name">Certification Analysis</field>
+        <field name="res_model">certification.report</field>
+        <field name="view_mode">graph,pivot</field>
+        <field name="target">current</field>
+    </record>
+
 
    <menuitem id="menu_report_certification"
         parent="certification_menu"
