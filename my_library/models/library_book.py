@@ -1,5 +1,9 @@
 from odoo import models, fields, api
 from datetime import timedelta
+from odoo.exceptions import UserError
+# This function is used to mark a string as translatable, and to retrieve the translated string at runtime,
+# given the language of the end user that's found in the execution context
+from odoo.tools.translate import _
 
 class BaseArchive(models.AbstractModel):
     _name = 'base.archive'
@@ -33,7 +37,8 @@ class LibraryBook(models.Model):
     state = fields.Selection(
         [('draft', 'Not Available'),
          ('available', 'Available'),
-         ('lost', 'Lost')], 'State')
+         ('borrowed', 'Borrowed'),
+         ('lost', 'Lost')], 'State', default='draft')
     description = fields.Html('Description')
     cover = fields.Binary('Book Cover')
     currency = fields.Many2one('res.currency', string="Currency")
@@ -74,6 +79,7 @@ class LibraryBook(models.Model):
                 book.age_days = delta.days
             else:
                 book.age_days = 0
+
     # implement the logic to write on the computed field
     def _inverse_age(self):
         today = fields.Date.today()
@@ -108,3 +114,122 @@ class LibraryBook(models.Model):
     def _referencable_models(self):
         models = self.env['ir.model'].search([('field_id.name', '=', 'message_ids')])
         return [(x.model, x.name) for x in models]
+
+    # Helper method to check whether a state transition is allowed
+    @api.model
+    def is_allowed_transition(self, old_state, new_state):
+        allowed = [('draft', 'available'),
+               ('available', 'borrowed'),
+               ('borrowed', 'available'),
+               ('available', 'lost'),
+               ('borrowed', 'lost'),
+               ('lost', 'available')]
+        return (old_state, new_state) in allowed
+
+    #Method to change the state of some books to a new state that i spassed as an argument
+    def change_state(self, new_state):
+        for book in self:
+            if book.is_allowed_transition(book.state, new_state):
+                book.state = new_state
+            else:
+                msg = _('Moving from %s to %s is not allowed') % (book.state, new_state)
+                raise UserError(msg)
+
+    # Methods to change the book state by calling the change_state method:
+    def make_available(self):
+        self.change_state('available')
+
+    def make_borrowed(self):
+        self.change_state('borrowed')
+
+    def make_lost(self):
+        self.change_state('lost')
+
+    # When writing a new method, if you don't use any decorator, then the method is executed
+    # on a recordset. In such methods, self is a recordset that can refer to an arbitrary number
+    # of database records (this includes empty recordsets), and the code will often loop over the
+    # records in self to do something on each individual record
+    # The @ api.model decorator is similar, but it's used on methods for which only the model
+
+    def get_all_library_members(self):
+        # This is an empty recordset of model library.member
+        library_member_model = self.env['library.member']
+        # The env attribute of any recordset, available as self.env , is an instance of the Environment class defined in the odoo.api module.
+        all_members = library_member_model.search([])
+        print("ALL MEMBERS:", all_members)
+        return True
+
+    #UPDATE VALUES OPTION 1
+    def change_release_date(self):
+        # The method starts by checking whether the book recordset that's passed as self contains exactly one record
+        # This is necessary because we don't won't to change the date of multiple records. If you want to update
+        # multiple values, you can remove ensure_one() and update the attribute using a loop on the recordset.
+        self.ensure_one()
+        self.date_updated = fields.Date.today()
+    '''
+    
+    UPDATE VALUES OPTION 2 is to use the update() method by passing dictionary mapping field names to the values you want to set. 
+    It can save some typing when you need to update the values of several fields at once on the same record
+    def change_update_date(self):
+        self.ensure_one()
+        self.update({
+            'date_release': fields.Datetime.now(),
+            'another_field': 'value'
+                ...
+        })
+     '''
+
+    '''
+    UPDATE VALUES OPTION 3 is to call the write() method, passing a dictionary that maps the field names to the values 
+    you want to set. This method works for recordsets of arbitrary size and will update all records with the specified 
+    values in one single database operation when the two previous options perform one database call per record and per field.
+    Also, it requires a special format when writing relational fields, similar to the one used by the create() method:
+    
+        - (0,0,dict_val): creates a new record that will be related to the main record
+        - (1,id,dict_val): updates the related record with the specified ID with the values supplied
+        - (2,id): removes the record with the specified ID from the related records and deletes it from the database
+        - (3,id): removes the record with the specified ID from the related records and it is not deleted from the database
+        - (4,id): adds an existing record with the supplied ID to the list of related records
+        - (5, ): removes all related records, equivalent to calling (3,id) for each related id
+        - (6,0,id_list): creates a relation between the record being updated and the existing record, whose ID are in the
+                         Python list called id_list
+                         
+    Operation types 1 , 2 , 3 , and 5 cannot be used with the create() method.            
+    '''
+
+    # We said previously that the search() method returned all the records matching the domain. This is not actually
+    # completely true. The security rules ensure that the user only gets those records to which they have read access rights.
+    def find_book(self):
+        domain = ['|','&', ('name', 'ilike', 'Book Name'),('category_id.name', 'ilike', 'Category Name'),
+             '&', ('name', 'ilike', 'Book Name 2'),('category_id.name', 'ilike', 'Category Name 2')]
+        books = self.search(domain)
+
+
+    # FILTER RECORDSET
+    def filter_books(self):
+        all_books = self.search([])
+        filtered_books = self.books_with_multiple_authors(all_books)
+        logger.info('Filtered Books: %s', filtered_books)
+
+    # All the records for which the predicate function evaluates to True are added to this empty recordset.
+    @api.model
+    def books_with_multiple_authors(self, all_books):
+        def predicate(book):
+            if len(book.author_ids) > 1:
+                return True
+            return False
+        return all_books.filter(predicate)
+
+    # the category name by travesing through the Many2one field's category_id as follows: book.category_id.name.
+    # However, when working with recordsets with more than one record, the attributes cannot be used.
+    @api.model
+    def get_author_names(self, books):
+        return books.mapped('authors_id.name')
+    # For each field in the path, mapped() produces a new recordset that contains all the records related by this field
+    # to all elements in the current recordset, and then the next element in the path applies to that new recordset.
+
+    @api.model
+    def sort_books_by_date(self, books):
+        return books.sorted(key='release_date') #Optional: reverse=True to return a recordset in reverse order
+
+

@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <odoo>
-    <!--Add a custom form view to the library_book.xml file:-->
+    <!--Add a custom form view to the library_return.xml file:-->
     <record id="library_book_view_form" model="ir.ui.view">
         <field name="name">Library Book Form</field>
         <field name="model">library.book</field>
@@ -13,7 +13,6 @@
                         <field name="publisher_id"/>
                         <field name="publisher_city"/>
                         <field name="notes"/>
-                        <field name="state"/>
                         <field name="pages"/>
                         <field name="cost_price"/>
                         <field name="active"/>
@@ -23,8 +22,17 @@
                         <field name="short_name"/>
                         <field name="date_release"/>
                         <field name="date_updated"/>
+                        <button name="change_release_date" string="Update Date" type="object"/>
                         <field name="cover" widget="image" class="oe_avatar"/>
                         <field name="reader_rating"/>
+                        <button name="get_all_library_members" string="Library Members" type="object"/>
+                    </group>
+
+                    <group>
+                        <button name="make_available" string="Make Available" type="object"/>
+                        <button name="make_borrowed" string="Make Borrowed" type="object"/>
+                        <button name="make_lost" string="Make Lost" type="object"/>
+                        <field name="state"/>
                     </group>
 
                     <group>
@@ -41,7 +49,7 @@
         </field>
     </record>
 
-    <!--Add a custom tree (list) view to the library_book.xml file:-->
+    <!--Add a custom tree (list) view to the library_return.xml file:-->
     <record id="library_book_view_tree" model="ir.ui.view">
         <field name="name">Library Book List</field>
         <field name="model">library.book</field>
@@ -53,7 +61,7 @@
         </field>
     </record>
 
-    <!--Add custom Search options to the library_book.xml file: -->
+    <!--Add custom Search options to the library_return.xml file: -->
     <record id="library_book_view_search" model="ir.ui.view">
         <field name="name">Library Book Search</field>
         <field name="model">library.book</field>
@@ -68,14 +76,14 @@
         </field>
     </record>
 
-    <!--Add the action that opens the views in the library_book.xml file:-->
+    <!--Add the action that opens the views in the library_return.xml file:-->
     <record id='library_book_action' model='ir.actions.act_window'>
         <field name="name">Library Books</field>
         <field name="res_model">library.book</field>
         <field name="view_mode">tree,form</field>
     </record>
 
-    <!--Add the menu items to the library_book.xml file, making it visible to users:-->
+    <!--Add the menu items to the library_return.xml file, making it visible to users:-->
     <menuitem name="My Library" id="library_base_menu" />
     <menuitem name="Books" id="library_book_menu"
               parent="library_base_menu"

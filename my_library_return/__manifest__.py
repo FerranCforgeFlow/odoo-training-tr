@@ -5,5 +5,5 @@
     'name': "My Library",
     'summary': "Manage books easily",
     'depends': ['base'],
-    'data': ['views/library_return.xml','views/library_book_categ.xml','security/groups.xml','security/ir.model.access.csv'],
+    'data': ['views/library_return.xml'],
 }

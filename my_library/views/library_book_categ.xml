@@ -9,12 +9,13 @@
                     <field name="name"/>
                     <field name="parent_id"/>
                     <field name="child_ids"/>
+                    <button name="create_categories" string="Create Categories" type="object"/>
                 </group>
             </form>
         </field>
     </record>
 
-    <!--Add a custom tree (list) view to the library_book.xml file:-->
+    <!--Add a custom tree (list) view to the library_return.xml file:-->
     <record id="library_book_view_tree" model="ir.ui.view">
         <field name="name">Library Categories List</field>
         <field name="model">library.book.category</field>
@@ -25,7 +26,7 @@
         </field>
     </record>
 
-    <!--Add the action that opens the views in the library_book.xml file:-->
+    <!--Add the action that opens the views in the library_return.xml file:-->
     <record id='library_book_category_action' model='ir.actions.act_window'>
         <field name="name">Book Categories</field>
         <field name="res_model">library.book.category</field>
